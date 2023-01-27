@@ -11,11 +11,12 @@ views = Blueprint('views', __name__)
 def home():
     if request.method == 'POST':
         note = request.form.get('note')
+        title = request.form.get('title')
         
         if len(note) < 1:
             flash('Note is too short.', category='error')
         else:
-            new_note = Note(data=note, user_id=current_user.id)
+            new_note = Note(data=note, user_id=current_user.id, title=title)
             db.session.add(new_note)
             db.session.commit()
             flash('Note added!', category='success')
@@ -33,3 +34,14 @@ def delete_note():
             db.session.commit()
             
     return jsonify({})
+
+@views.route('/search', methods=['GET'])
+@login_required
+def search():
+    query = request.args.get("query")
+
+    if query:
+        filtered_notes = Note.query.filter(Note.title.contains(query) | Note.data.contains(query))
+    else:
+        filtered_notes = Note.query.all()
+    return render_template("search.html", user=current_user, filtered_notes=filtered_notes)
