@@ -1,2 +1,2 @@
 # Unknown
-A web application for meeting new people :)
+A web application for storing notes
